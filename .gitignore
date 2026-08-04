@@ -1,0 +1,30 @@
+# ── Environment & Secrets ────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Runtime Data ─────────────────────────────────────
+database.db
+log.txt
+bot.log
+activevc.txt
+cookies.txt
+
+# ── Telegram Sessions (auth keys) ────────────────────
+*.session
+*.session-journal
+
+# ── Virtual Env & Caches ─────────────────────────────
+venv/
+__pycache__/
+*.py[cod]
+cache/
+downloads/
+devverse/cookies/
+
+# ── Unrelated Local Projects ─────────────────────────
+Wifi/
+
+# ── OS Files ─────────────────────────────────────────
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2025 Delete_ee
+# Licensed under the MIT License.
+# This file is part of Delete_ee
+
+
+from pyrogram import filters, types
+
+from devverse import anon, app, db, lang
+from devverse.helpers import buttons, can_manage_vc, utils
+
+@app.on_message(filters.command(["resume"]) & filters.group & ~app.bl_users)
+@lang.language()
+@can_manage_vc
+async def _resume(_, m: types.Message):
+    if not await db.get_call(m.chat.id):
+        return await m.reply_text(m.lang["not_playing"])
+
+    if await db.playing(m.chat.id):
+        return await m.reply_text(m.lang["play_not_paused"])
+
+    await anon.resume(m.chat.id)
+    await utils.action_log("▶️ RESUMED STREAM", m)
+    
+    await m.reply_text(
+        text=m.lang["play_resumed"].format(m.from_user.mention),
+        reply_markup=buttons.controls(m.chat.id),
+    )
+

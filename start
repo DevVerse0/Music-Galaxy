@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Music Galaxy Bot Startup Script
+# Optimized for Railway
+
+echo "----------------------------------------------------"
+echo "  🚀 Starting Music Galaxy..."
+echo "  💎 Version: 3.5.0"
+echo "  🛠️ Environment: Production"
+echo "----------------------------------------------------"
+
+# Run the bot
+python3 -m devverse
+

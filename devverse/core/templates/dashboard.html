@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Galaxy | Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:#8b5cf6;--s:#d946ef;--a:#06b6d4;--bg:#030712;--c:rgba(17,24,39,.9);--t:#f9fafb;--td:#9ca3af;--ok:#10b981;--err:#f43f5e;--warn:#f59e0b;--glow:rgba(139,92,246,.4)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Space Grotesk',sans-serif}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}70%{box-shadow:0 0 0 12px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+body{background:var(--bg);color:var(--t);min-height:100vh;display:flex;position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(rgba(255,255,255,.02) 0 1px,transparent 1px 40px),repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 1px,transparent 1px 40px);pointer-events:none;z-index:-1;animation:slide 20s linear infinite}
+@keyframes slide{from{transform:translateY(0)}to{transform:translateY(40px)}}
+nav{width:260px;background:rgba(0,0,0,.6);backdrop-filter:blur(24px);border-right:1px solid rgba(255,255,255,.06);padding:1.5rem 1rem;display:flex;flex-direction:column;gap:.3rem;position:fixed;height:100vh;overflow-y:auto;z-index:100}
+.logo{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;padding:.8rem .5rem 1.2rem;letter-spacing:-.03em}
+.sub{font-size:.65rem;color:var(--td);display:block;margin-top:-1rem;padding:.2rem .5rem .8rem;-webkit-text-fill-color:var(--td)}
+.nl{padding:.75rem 1rem;border-radius:.75rem;color:var(--td);text-decoration:none;display:flex;align-items:center;gap:.7rem;transition:.2s;cursor:pointer;border:1px solid transparent;font-size:.875rem;font-weight:500}
+.nl:hover{background:rgba(139,92,246,.1);color:var(--t);border-color:rgba(139,92,246,.2)}
+.nl.active{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;box-shadow:0 4px 15px var(--glow)}
+.nl-sec{font-size:.65rem;color:var(--td);padding:.5rem 1rem .2rem;text-transform:uppercase;letter-spacing:.1em}
+.nb{margin-top:auto;display:flex;flex-direction:column;gap:.4rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06)}
+main{flex:1;margin-left:260px;padding:2rem;min-height:100vh}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem}
+.hdr h1{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,var(--t),var(--td));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{background:rgba(16,185,129,.1);color:var(--ok);padding:.4rem 1rem;border-radius:2rem;font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:.4rem;border:1px solid rgba(16,185,129,.2);animation:pulse 2s infinite}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.tab{display:none;animation:fadeIn .35s ease-out}.tab.active{display:block}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.sg2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem}
+.sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.card{background:var(--c);padding:1.5rem;border-radius:1.5rem;border:1px solid rgba(255,255,255,.05);backdrop-filter:blur(20px);margin-bottom:1.2rem;position:relative;overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1)}
+.card::after{content:"";position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);transition:.5s}
+.card:hover::after{left:100%}
+.card:hover{border-color:rgba(139,92,246,.3);transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(139,92,246,.2)}
+.sc{background:var(--c);padding:1.5rem;border-radius:1.5rem;border:1px solid rgba(255,255,255,.06);transition:.25s;cursor:default}
+.sc:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.3)}
+.sl{color:var(--td);font-size:.8rem;font-weight:500;margin-bottom:.3rem}
+.sv{font-size:2rem;font-weight:800;letter-spacing:-.03em}
+.sv.p{color:var(--p)}.sv.a{color:var(--a)}.sv.ok{color:var(--ok)}.sv.err{color:var(--err)}.sv.warn{color:var(--warn)}
+.fi{width:100%;padding:.85rem 1rem;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);border-radius:.75rem;color:#fff;margin-bottom:.75rem;transition:.2s;font-size:.875rem}
+.fi:focus{outline:none;border-color:var(--p);background:rgba(0,0,0,.7)}
+textarea.fi{resize:vertical;min-height:100px}
+select.fi{cursor:pointer}
+.btn{padding:.8rem 1.2rem;border-radius:.75rem;border:none;font-weight:700;font-size:.85rem;cursor:pointer;transition:.25s;display:inline-flex;align-items:center;justify-content:center;gap:.5rem}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;width:100%}
+.btn-p:hover{transform:scale(1.02);box-shadow:0 8px 25px var(--glow)}
+.btn-ok{background:var(--ok);color:#000}
+.btn-ok:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-err{background:var(--err);color:#fff}
+.btn-err:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-a{background:var(--a);color:#000}
+.btn-a:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-w{background:var(--warn);color:#000}
+.btn-w:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-sm{padding:.5rem 1rem;font-size:.78rem}
+.btn-full{width:100%}
+.btn-nav{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--t);width:100%;padding:.7rem;border-radius:.75rem;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s}
+.btn-nav:hover{background:rgba(255,255,255,.08)}
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.tbl th{text-align:left;padding:.75rem 1rem;color:var(--td);border-bottom:1px solid rgba(255,255,255,.06);font-weight:600}
+.tbl td{padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tag{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:.5rem;font-size:.72rem;font-weight:700}
+.tag-ok{background:rgba(16,185,129,.15);color:var(--ok)}
+.tag-err{background:rgba(244,63,94,.15);color:var(--err)}
+.tag-p{background:rgba(139,92,246,.15);color:var(--p)}
+.tag-a{background:rgba(6,182,212,.15);color:var(--a)}
+.tag-w{background:rgba(245,158,11,.15);color:var(--warn)}
+.pb{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin:.4rem 0}
+.pf{height:100%;background:linear-gradient(90deg,var(--p),var(--a));border-radius:4px;transition:1s}
+.pl{display:flex;justify-content:space-between;font-size:.78rem;color:var(--td);margin-bottom:.2rem}
+.logbox{background:rgba(0,0,0,.8);padding:1.2rem;border-radius:1rem;height:350px;overflow-y:auto;font-family:monospace;color:var(--a);font-size:.78rem;line-height:1.7;white-space:pre-wrap}
+.toast-wrap{position:fixed;top:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+.toast{padding:.85rem 1.2rem;border-radius:1rem;border:1px solid;font-size:.85rem;font-weight:600;min-width:260px;animation:fadeIn .3s ease-out;backdrop-filter:blur(10px)}
+.toast.s{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:var(--ok)}
+.toast.e{background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.3);color:var(--err)}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin:.8rem 0}
+.info-item{background:rgba(255,255,255,.04);padding:.7rem 1rem;border-radius:.75rem;font-size:.8rem}
+.info-item span{display:block;color:var(--td);font-size:.72rem;margin-bottom:.2rem}
+.divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:1rem 0}
+.tgl{width:100%;padding:.75rem 1rem;border-radius:.75rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--t);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;font-weight:600;transition:.2s}
+.tgl.on{border-color:var(--ok);background:rgba(16,185,129,.1);color:var(--ok)}
+.led{width:10px;height:10px;border-radius:50%;background:var(--td)}.tgl.on .led{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+h3{font-size:1.1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+label.lbl{display:block;font-size:.78rem;color:var(--td);margin-bottom:.3rem;font-weight:600}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.split3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.vc-item{display:flex;justify-content:space-between;align-items:center;padding:1rem;background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.1);border-radius:1rem;margin-bottom:.6rem}
+.vc-btns{display:flex;gap:.4rem}
+.radio-group{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+.radio-opt input{display:none}
+.radio-opt label{padding:.5rem 1rem;border-radius:.75rem;border:1px solid rgba(255,255,255,.1);color:var(--td);font-size:.8rem;cursor:pointer;transition:.2s;display:block}
+.radio-opt input:checked+label{border-color:var(--p);background:rgba(139,92,246,.15);color:var(--p)}
+code{background:rgba(255,255,255,.06);padding:.15rem .4rem;border-radius:.4rem;font-size:.82rem}
+.empty{text-align:center;color:var(--td);padding:2rem;font-size:.875rem}
+.spy-item{display:flex;justify-content:space-between;align-items:center;padding:.6rem 1rem;background:rgba(255,255,255,.04);border-radius:.75rem;margin-bottom:.4rem;font-size:.82rem}
+.usr-card{padding:.8rem 1rem;background:rgba(255,255,255,.03);border-radius:.75rem;border:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;font-size:.8rem}
+.search-wrap{margin-bottom:1rem;display:flex;gap:.5rem}
+.search-wrap input{flex:1}
+.queue-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;background:rgba(255,255,255,.03);border-radius:.6rem;margin-bottom:.3rem;font-size:.78rem;gap:.5rem}
+.queue-item .q-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.np-refresh{font-size:.7rem;color:var(--td);cursor:pointer}
+.np-refresh:hover{color:var(--p)}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toasts"></div>
+<nav>
+  <div class="logo">🎵 Music Galaxy<span class="sub">Advanced Music Core ✨</span></div>
+  <div class="nl-sec">Core</div>
+  <div class="nl active" data-tab="overview" onclick="ST('overview',this)">OVERVIEW</div>
+  <div class="nl" data-tab="streams" onclick="ST('streams',this)">LIVE STREAMS</div>
+  <div class="nl" data-tab="broadcast" onclick="ST('broadcast',this)">BROADCAST</div>
+  <div class="nl-sec">Management</div>
+  <div class="nl" data-tab="console" onclick="ST('console',this)">ADMIN CONSOLE</div>
+  <div class="nl" data-tab="groups" onclick="ST('groups',this)">GROUP MANAGER</div>
+  <div class="nl" data-tab="assistants" onclick="ST('assistants',this)">ASSISTANTS</div>
+  <div class="nl" data-tab="premium" onclick="ST('premium',this)">PREMIUM GROUPS</div>
+  <div class="nl-sec">Intelligence</div>
+  <div class="nl" data-tab="spy" onclick="ST('spy',this)">SPY SYSTEM</div>
+  <div class="nl" data-tab="users" onclick="ST('users',this)">USER DATABASE</div>
+  <div class="nl" data-tab="songlogs" onclick="ST('songlogs',this)">MUSIC LOGS</div>
+  <div class="nl" data-tab="logs" onclick="ST('logs',this)">AUDIT LOGS</div>
+  <div class="nl-sec">System</div>
+  <div class="nl" data-tab="settings" onclick="ST('settings',this)">⚙️ SETTINGS</div>
+  <div class="nb">
+    <a href="/download-db" class="btn-nav">🗄️ Download SQLite DB</a>
+    <a href="/download-users-txt" class="btn-nav">👥 Get Users List</a>
+    <a href="/download-groups-txt" class="btn-nav">🏘️ Get Groups List</a>
+    <form action="/clean" method="POST"><button class="btn-nav">🧹 Clean Cache</button></form>
+    <form action="/restart" method="POST"><button class="btn-nav" style="border-color:rgba(244,63,94,.3);color:var(--err)">🚀 Restart Bot</button></form>
+    <form action="/logout" method="POST"><button class="btn-nav">🚪 Logout</button></form>
+  </div>
+</nav>
+
+<main>
+<div class="hdr">
+  <div>
+    <h1>Master Control Panel</h1>
+    <p style="color:var(--td);font-size:.85rem;margin-top:.3rem;font-weight:600">Music Galaxy Dashboard (V5.0)</p>
+  </div>
+  <div class="badge"><span class="dot"></span> SECURE UPLINK · {{ bot_name }}</div>
+</div>
+
+<!-- ═══ OVERVIEW ═══ -->
+<div id="overview" class="tab active">
+  <div class="sg">
+    <div class="sc"><div class="sl">Total Users</div><div class="sv p" data-count="{{ stats.users }}">{{ stats.users }}</div></div>
+    <div class="sc"><div class="sl">Active Groups</div><div class="sv a" data-count="{{ stats.chats }}">{{ stats.chats }}</div></div>
+    <div class="sc"><div class="sl">Live Streams</div><div class="sv err" data-count="{{ stats.calls }}">{{ stats.calls }}</div></div>
+    <div class="sc"><div class="sl">Songs Played</div><div class="sv ok" data-count="{{ stats.songs }}">{{ stats.songs }}</div></div>
+    <div class="sc"><div class="sl">Global Bans</div><div class="sv err" data-count="{{ stats.gbans }}">{{ stats.gbans }}</div></div>
+    <div class="sc"><div class="sl">Sudo Users</div><div class="sv p" data-count="{{ stats.sudoers }}">{{ stats.sudoers }}</div></div>
+    <div class="sc"><div class="sl">Restricted</div><div class="sv warn" data-count="{{ stats.restricted }}">{{ stats.restricted }}</div></div>
+    <div class="sc"><div class="sl">Bot PID</div><div class="sv a">{{ system.pid }}</div></div>
+  </div>
+  <div class="split2">
+    <div>
+      <div class="card">
+        <h3>⚡ System Telemetry</h3>
+        <div class="pl"><span>CPU</span><span>{{ system.cpu }}%</span></div><div class="pb"><div class="pf" style="width:{{ system.cpu }}%"></div></div>
+        <div class="pl"><span>RAM {{ system.ram_used }}GB / {{ system.ram_total }}GB</span><span>{{ system.ram }}%</span></div><div class="pb"><div class="pf" style="width:{{ system.ram }}%;background:linear-gradient(90deg,var(--s),var(--p))"></div></div>
+        <div class="pl"><span>Disk {{ system.disk_used }}GB / {{ system.disk_total }}GB</span><span>{{ system.disk }}%</span></div><div class="pb"><div class="pf" style="width:{{ system.disk }}%;background:linear-gradient(90deg,var(--a),var(--ok))"></div></div>
+        <p style="margin-top:1rem;color:var(--td);font-size:.82rem">Uptime: <b style="color:var(--a)">{{ system.uptime }}</b></p>
+      </div>
+      <div class="card">
+        <h3>⚙️ System Toggles</h3>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <form action="/toggle" method="POST"><input type="hidden" name="key" value="auto_leave"><button class="tgl {{ 'on' if system.auto_leave else '' }}">🚶 Assistant Auto-Leave <span class="led"></span></button></form>
+          <form action="/toggle" method="POST"><input type="hidden" name="key" value="auto_end"><button class="tgl {{ 'on' if system.auto_end else '' }}">⏱️ Stream Auto-End <span class="led"></span></button></form>
+          <form action="/toggle" method="POST"><input type="hidden" name="key" value="maintenance"><button class="tgl {{ 'on' if system.maintenance else '' }}">🔧 Maintenance Mode <span class="led"></span></button></form>
+        </div>
+        <div style="margin-top:1rem;font-size:.75rem;color:var(--td)"><p>🕐 File auto-purge: <b>30 min</b> &nbsp;|&nbsp; ⏰ Idle timeout: <b>120s</b></p></div>
+      </div>
+
+    </div>
+    <div>
+      <div class="card">
+        <h3>🎵 Now Playing <span style="font-size:.7rem;color:var(--td);font-weight:400" id="np-status">● live</span></h3>
+        <div id="now-playing-list">
+          {% for vc in active_vcs %}
+          <div class="np-item" data-chat="{{ vc.id }}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div><b style="font-size:.9rem">{{ vc.title }}</b><br><code>{{ vc.id }}</code> · {{ vc.members }} members</div>
+              <span class="tag {{ 'tag-ok' if vc.playing else 'tag-err' }}">{{ '▶ Playing' if vc.playing else '⏸ Paused' }}</span>
+            </div>
+            <div class="np-track" style="margin-top:.5rem;padding:.5rem;background:rgba(0,0,0,.3);border-radius:.75rem">
+              <div style="display:flex;justify-content:space-between;font-size:.8rem">
+                <span id="np-title-{{ vc.id }}" style="color:var(--a);font-weight:600">Loading...</span>
+                <span id="np-time-{{ vc.id }}" style="color:var(--td)">--:-- / --:--</span>
+              </div>
+              <div class="pb" style="margin:.3rem 0"><div class="pf" id="np-bar-{{ vc.id }}" style="width:0%"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--td)">
+                <span id="np-req-{{ vc.id }}">👤 ...</span>
+              </div>
+            </div>
+          </div>
+          {% else %}<p class="empty">No active streams.</p>{% endfor %}
+        </div>
+      </div>
+      <div class="card">
+        <h3>📊 Quick Stats</h3>
+        <div style="font-size:.82rem;display:flex;flex-direction:column;gap:.5rem;color:var(--td)">
+          <div style="display:flex;justify-content:space-between"><span>Owner ID</span><code>{{ owner_id }}</code></div>
+          <div style="display:flex;justify-content:space-between"><span>Bot Name</span><code>{{ bot_name }}</code></div>
+          <div style="display:flex;justify-content:space-between"><span>Active Assistants</span><code>{{ assistants|length }}</code></div>
+          <div style="display:flex;justify-content:space-between"><span>Active Spy Targets</span><code>{{ all_spies|length }}</code></div>
+          <div style="display:flex;justify-content:space-between"><span>Song Logs</span><code>{{ song_logs|length }}</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STREAMS ═══ -->
+<div id="streams" class="tab">
+  <div class="card"><h3>📡 Live Transmission Control <span style="font-size:.7rem;color:var(--td);font-weight:400">(auto-refresh 10s)</span></h3>
+    {% for vc in active_vcs %}
+    <div class="vc-item" style="flex-wrap:wrap">
+      <div style="flex:1;min-width:200px"><b>{{ vc.title }}</b><br><code>{{ vc.id }}</code> · <span class="tag {{ 'tag-ok' if vc.playing else 'tag-err' }}">{{ 'Playing' if vc.playing else 'Paused' }}</span></div>
+      <div class="vc-btns">
+        {% if vc.playing %}<form action="/pause-stream" method="POST"><input type="hidden" name="chat_id" value="{{ vc.id }}"><button class="btn btn-w btn-sm">⏸</button></form>
+        {% else %}<form action="/resume-stream" method="POST"><input type="hidden" name="chat_id" value="{{ vc.id }}"><button class="btn btn-ok btn-sm">▶</button></form>{% endif %}
+        <form action="/skip-stream" method="POST"><input type="hidden" name="chat_id" value="{{ vc.id }}"><button class="btn btn-a btn-sm">⏭</button></form>
+        <form action="/stop-stream" method="POST"><input type="hidden" name="chat_id" value="{{ vc.id }}"><button class="btn btn-err btn-sm">⏹</button></form>
+        <button class="btn btn-ok btn-sm" onclick="toggleQueue({{ vc.id }})">📋 Q</button>
+      </div>
+      <div id="queue-{{ vc.id }}" class="queue-box" style="display:none;width:100%;margin-top:.5rem;padding:.5rem;background:rgba(0,0,0,.3);border-radius:.6rem">
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--td);margin-bottom:.3rem">
+          <span>📋 Queue</span><span class="np-refresh" onclick="loadQueue({{ vc.id }})">🔄 refresh</span>
+        </div>
+        <div id="queue-list-{{ vc.id }}">Loading...</div>
+      </div>
+    </div>
+    {% else %}<p class="empty">No active streams.</p>{% endfor %}
+  </div>
+</div>
+
+<!-- ═══ BROADCAST ═══ -->
+<div id="broadcast" class="tab">
+  <div class="card"><h3>📢 Advanced Broadcast System</h3>
+    <form action="/broadcast" method="POST">
+      <label class="lbl">Message</label>
+      <textarea name="message" class="fi" placeholder="Your broadcast message… (supports HTML)"></textarea>
+      <label class="lbl">Media Link (optional — image/video URL)</label>
+      <input type="url" name="media_link" class="fi" placeholder="https://example.com/image.jpg">
+      <label class="lbl">Target</label>
+      <div class="radio-group">
+        <div class="radio-opt"><input type="radio" name="target_type" id="t1" value="all" checked><label for="t1">📡 All Groups</label></div>
+        <div class="radio-opt"><input type="radio" name="target_type" id="t2" value="all_users"><label for="t2">👥 All Users</label></div>
+        <div class="radio-opt"><input type="radio" name="target_type" id="t3" value="specific_group"><label for="t3">🏘️ Specific Groups</label></div>
+        <div class="radio-opt"><input type="radio" name="target_type" id="t4" value="specific_uid"><label for="t4">👤 Specific Users</label></div>
+      </div>
+      <label class="lbl">Specific IDs (comma-separated, for Specific targets)</label>
+      <input type="text" name="target_id" class="fi" placeholder="-1001234567890, -1009876543210">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem">
+        <input type="checkbox" name="pin_message" value="1" id="pin" style="width:18px;height:18px;cursor:pointer">
+        <label for="pin" style="cursor:pointer;font-size:.85rem">📌 Pin message after sending</label>
+      </div>
+      <button type="submit" class="btn btn-p">🚀 Launch Broadcast</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ ADMIN CONSOLE ═══ -->
+<div id="console" class="tab">
+  <div class="split2">
+    <div>
+      <div class="card"><h3>🎮 Remote Admin Console</h3>
+        <form action="/remote-admin" method="POST">
+          <label class="lbl">User ID / @Username</label>
+          <input type="text" name="user_id" class="fi" placeholder="123456789 or @username" required>
+          <label class="lbl">Group ID</label>
+          <input type="number" name="chat_id" class="fi" placeholder="-100xxxxxxxxxx" required>
+          <label class="lbl">Action</label>
+          <select name="action" class="fi">
+            <option value="ban">🔒 BAN</option>
+            <option value="kick">👢 KICK</option>
+            <option value="mute">🔇 MUTE</option>
+            <option value="unmute">🔊 UNMUTE</option>
+            <option value="unban">🔓 UNBAN</option>
+            <option value="promote">⬆️ PROMOTE</option>
+            <option value="demote">⬇️ DEMOTE</option>
+            <option value="restrict_bot">🚫 BOT-RESTRICT</option>
+            <option value="unrestrict_bot">✅ BOT-UNRESTRICT</option>
+          </select>
+          <button type="submit" class="btn btn-p">⚡ Execute</button>
+        </form>
+      </div>
+      <div class="card"><h3>⚖️ Global Ban System</h3>
+        <form action="/gban" method="POST" style="margin-bottom:1rem">
+          <label class="lbl">User ID</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID to globally ban" required>
+          <label class="lbl">Reason</label>
+          <input type="text" name="reason" class="fi" placeholder="Spam, abuse...">
+          <button type="submit" class="btn btn-err btn-full">🔒 Global Ban</button>
+        </form>
+        <form action="/ungban" method="POST">
+          <label class="lbl">Unban User ID</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID to unban" required>
+          <button type="submit" class="btn btn-ok btn-full">🔓 Lift Global Ban</button>
+        </form>
+        {% if gbans %}
+        <hr class="divider">
+        <div style="max-height:160px;overflow-y:auto">
+          <p style="font-size:.75rem;color:var(--td);margin-bottom:.5rem">Active GBans ({{ gbans|length }})</p>
+          {% for g in gbans %}<div class="usr-card"><code>{{ g }}</code><form action="/ungban" method="POST"><input type="hidden" name="user_id" value="{{ g }}"><button class="btn btn-err btn-sm">Lift</button></form></div>{% endfor %}
+        </div>{% endif %}
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>🛡️ Sudo Management</h3>
+        <form action="/add-sudo" method="POST" style="margin-bottom:1rem">
+          <label class="lbl">Grant Sudo Access</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID" required>
+          <button type="submit" class="btn btn-ok btn-full">✅ Grant Sudo</button>
+        </form>
+        <form action="/del-sudo" method="POST"><label class="lbl">Revoke Sudo</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID" required>
+          <button type="submit" class="btn btn-err btn-full">❌ Revoke Sudo</button>
+        </form>
+        {% if sudo_users %}<hr class="divider"><div style="max-height:160px;overflow-y:auto">
+          <p style="font-size:.75rem;color:var(--td);margin-bottom:.5rem">Sudo Users ({{ sudo_users|length }})</p>
+          {% for s in sudo_users %}<div class="usr-card"><code>{{ s }}</code><form action="/del-sudo" method="POST"><input type="hidden" name="user_id" value="{{ s }}"><button class="btn btn-err btn-sm">Revoke</button></form></div>{% endfor %}
+        </div>{% endif %}
+      </div>
+      <div class="card"><h3>🚫 Bot-Level Restriction</h3>
+        <form action="/restrict-user" method="POST" style="margin-bottom:1rem">
+          <label class="lbl">Restrict User (blocks bot usage)</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID" required>
+          <input type="text" name="reason" class="fi" placeholder="Reason">
+          <button type="submit" class="btn btn-err btn-full">🚫 Restrict from Bot</button>
+        </form>
+        <form action="/unrestrict-user" method="POST">
+          <label class="lbl">Unrestrict User</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID" required>
+          <button type="submit" class="btn btn-ok btn-full">✅ Unrestrict</button>
+        </form>
+        {% if restricted_users %}<hr class="divider"><div style="max-height:150px;overflow-y:auto">
+          <p style="font-size:.75rem;color:var(--td);margin-bottom:.5rem">Restricted ({{ restricted_users|length }})</p>
+          {% for r in restricted_users %}<div class="usr-card"><div><code>{{ r.user_id }}</code> <span style="color:var(--td)">{{ r.reason[:30] }}</span></div><form action="/unrestrict-user" method="POST"><input type="hidden" name="user_id" value="{{ r.user_id }}"><button class="btn btn-ok btn-sm">Free</button></form></div>{% endfor %}
+        </div>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GROUP MANAGER ═══ -->
+<div id="groups" class="tab">
+  <div class="split2">
+    <div>
+      <div class="card"><h3>🔍 Group Search</h3>
+        <form action="/group-search" method="POST">
+          <label class="lbl">Group ID</label>
+          <input type="text" name="chat_id" class="fi" placeholder="-100xxxxxxxxxx" required>
+          <button type="submit" class="btn btn-p">🔍 Fetch Group Info</button>
+        </form>
+        {% if searched_group %}
+        <hr class="divider">
+        <div class="info-grid">
+          <div class="info-item"><span>ID</span><code>{{ searched_group.id }}</code></div>
+          <div class="info-item"><span>Title</span><b>{{ searched_group.title }}</b></div>
+          <div class="info-item"><span>Username</span>{{ searched_group.username }}</div>
+          <div class="info-item"><span>Type</span>{{ searched_group.type }}</div>
+          <div class="info-item"><span>Members</span>{{ searched_group.members }}</div>
+          <div class="info-item"><span>DC</span>{{ searched_group.dc_id }}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:.75rem;padding:.75rem;font-size:.8rem;color:var(--td);margin:.5rem 0">{{ searched_group.description }}</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+          <span class="tag {{ 'tag-err' if searched_group.is_restricted else 'tag-ok' }}">{{ 'Restricted' if searched_group.is_restricted else 'Active' }}</span>
+          <span class="tag {{ 'tag-ok' if searched_group.is_verified else 'tag-p' }}">{{ 'Verified' if searched_group.is_verified else 'Unverified' }}</span>
+        </div>
+        {% if last_link %}<div style="margin-top:.75rem;padding:.75rem;background:rgba(6,182,212,.1);border-radius:.75rem;font-size:.8rem;word-break:break-all;color:var(--a)">🔗 {{ last_link }}</div>{% endif %}
+        {% endif %}
+      </div>
+
+      <div class="card"><h3>⚙️ Group Actions</h3>
+        <form action="/group-action" method="POST" id="gaf" style="display:flex;flex-direction:column;gap:.6rem">
+          <label class="lbl">Target Group ID</label>
+          <input type="number" name="chat_id" class="fi" id="gid" placeholder="-100xxxxxxxxxx" required>
+          <label class="lbl">Action</label>
+          <select name="action" class="fi" id="gaction" onchange="handleGAction(this.value)">
+            <optgroup label="Info"><option value="get_link">🔗 Get Invite Link</option><option value="revoke_link">🔄 Revoke Invite Link</option></optgroup>
+            <optgroup label="Settings"><option value="set_title">✏️ Change Title</option><option value="set_description">📝 Change Description</option><option value="lock_group">🔒 Lock Group</option><option value="unlock_group">🔓 Unlock Group</option></optgroup>
+            <optgroup label="Voice Chat"><option value="start_vc">🎙️ Start VC</option><option value="close_vc">🔕 Close VC</option></optgroup>
+            <optgroup label="Members"><option value="kick_all">👢 Kick All Members</option><option value="ban_all">🔒 Ban All Members</option><option value="mute_all">🔇 Mute All</option><option value="unmute_all">🔊 Unmute All</option></optgroup>
+            <optgroup label="Messages"><option value="delete_all_messages">🗑️ Delete All Messages</option><option value="delete_user_messages">🗑️ Delete User's Messages</option></optgroup>
+            <optgroup label="Bot"><option value="leave_bot">🚪 Bot Leave Group</option></optgroup>
+          </select>
+          <div id="extra-wrap" style="display:none">
+            <label class="lbl" id="extra-lbl">Extra Value</label>
+            <input type="text" name="extra" class="fi" id="extra-inp" placeholder="">
+          </div>
+          <button type="submit" class="btn btn-p">⚡ Execute Action</button>
+        </form>
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>🏘️ Known Groups ({{ all_groups_info|length }})</h3>
+        <div style="max-height:500px;overflow-y:auto">
+          {% for g in all_groups_info %}
+          <div class="usr-card">
+            <div>
+              <b style="font-size:.85rem">{{ g.title or 'Unknown' }}</b><br>
+              <code>{{ g.chat_id }}</code> · {{ g.member_count }} members · 🎵 {{ g.total_songs_played }}
+            </div>
+            <span class="tag {{ 'tag-err' if g.is_blacklisted else 'tag-ok' }}">{{ 'Blacklisted' if g.is_blacklisted else 'Active' }}</span>
+          </div>
+          {% else %}<p class="empty">No groups recorded yet.</p>{% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ASSISTANTS ═══ -->
+<div id="assistants" class="tab">
+  <div class="card"><h3>🤖 Assistant Status Panel</h3>
+    {% for a in assistants %}
+    <div style="background:rgba(255,255,255,.04);border-radius:1rem;padding:1rem;margin-bottom:.75rem;border:1px solid rgba(255,255,255,0.03)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+        <div>
+          <b style="font-size:1.05rem">🤖 #{{ a.index }} — {{ a.name }}</b> <code>@{{ a.username }}</code><br>
+          <small style="color:var(--td)">ID: {{ a.id }} · Active in {{ a.active_chats }} chats</small>
+        </div>
+        <span class="tag {{ 'tag-ok' if a.id else 'tag-err' }}">{{ 'Online' if a.id else 'Offline' }}</span>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <form action="/assistant-action" method="POST" style="display:contents">
+          <input type="hidden" name="assistant_index" value="{{ a.index }}">
+          <input type="hidden" name="action" value="leave_all_vcs">
+          <button class="btn btn-w btn-sm">🔕 Leave All VCs</button>
+        </form>
+        <form action="/assistant-action" method="POST" style="display:contents">
+          <input type="hidden" name="assistant_index" value="{{ a.index }}">
+          <input type="hidden" name="action" value="leave_all_groups">
+          <button class="btn btn-err btn-sm">🚪 Leave All Groups</button>
+        </form>
+      </div>
+      <form action="/assistant-action" method="POST" style="display:flex;gap:.5rem;margin-top:.6rem">
+        <input type="hidden" name="assistant_index" value="{{ a.index }}">
+        <input type="number" name="chat_id" class="fi" placeholder="Group ID to leave VC/Group" style="margin:0;flex:1">
+        <select name="action" class="fi" style="margin:0;width:auto">
+          <option value="leave_vc">Leave VC</option><option value="leave_group">Leave Group</option>
+        </select>
+        <button type="submit" class="btn btn-p btn-sm">Go</button>
+      </form>
+    </div>
+    {% else %}<p class="empty">No assistants configured.</p>{% endfor %}
+  </div>
+</div>
+
+<!-- ═══ PREMIUM ═══ -->
+<div id="premium" class="tab">
+  <div class="split2">
+    <div>
+      <div class="card">
+        <h3>🌟 Manage Premium Groups</h3>
+        <p style="color:var(--td);font-size:.85rem;margin-bottom:1rem">Grant groups priority playback, access to premium-only commands, and bypass limits.</p>
+        <form action="/set-premium" method="POST">
+          <label class="lbl">Group ID / Chat ID</label>
+          <input type="number" name="chat_id" class="fi" placeholder="-100xxxxxxxxxx" required>
+          <label class="lbl">Plan Tier</label>
+          <select name="plan" class="fi">
+            <option value="pro">Pro Tier 🚀</option>
+            <option value="elite">Elite Tier 💎</option>
+            <option value="infinite">Infinite 🌠</option>
+          </select>
+          <label class="lbl">Duration (Days)</label>
+          <input type="number" name="days" class="fi" placeholder="30" value="30">
+          <button type="submit" class="btn btn-p" style="margin-top:0.5rem">✨ Grant Premium</button>
+        </form>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>🏆 Active Premium Groups ({{ premium_chats|length }})</h3>
+        <div style="max-height:400px;overflow-y:auto">
+          {% for p in premium_chats %}
+          <div class="usr-card" style="align-items:flex-start">
+            <div>
+              <b style="font-size:.9rem;color:var(--a)">{{ p.plan | upper }} TIER</b><br>
+              <code>{{ p.chat_id }}</code><br>
+              <small style="color:var(--td)">Expires: {{ p.expires_at | default('Never') }}</small>
+            </div>
+          </div>
+          {% else %}<p class="empty">No premium groups currently active.</p>{% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SPY SYSTEM ═══ -->
+<div id="spy" class="tab">
+  <div class="split2">
+    <div>
+      <div class="card"><h3>🕵️ Add Spy Target</h3>
+        <p style="color:var(--td);font-size:.82rem;margin-bottom:1rem">Monitor every message a user sends. Logs are sent to the specified destination group.</p>
+        <form action="/add-spy" method="POST">
+          <label class="lbl">Target User ID</label>
+          <input type="number" name="user_id" class="fi" placeholder="User ID to spy on" required>
+          <label class="lbl">Destination Group ID (0 = use LOGGER_ID)</label>
+          <input type="number" name="dest_group_id" class="fi" placeholder="-100xxxxxxxxxx or 0" value="0">
+          <button type="submit" class="btn btn-p">🕵️ Activate Spy</button>
+        </form>
+      </div>
+      <div class="card"><h3>📊 Spy System Info</h3>
+        <div class="info-grid">
+          <div class="info-item"><span>Active Targets</span><b style="color:var(--p)">{{ all_spies|length }}</b></div>
+          <div class="info-item"><span>Mode</span><b style="color:var(--a)">Silent</b></div>
+        </div>
+        <p style="font-size:.78rem;color:var(--td);margin-top:.5rem">The spy system copies messages and media silently to the destination group without alerting the source.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>🎯 Active Spy Targets ({{ all_spies|length }})</h3>
+        {% for spy in all_spies %}
+        <div class="spy-item">
+          <div>
+            <code>{{ spy.user_id }}</code><br>
+            <small style="color:var(--td)">Dest: <code>{{ spy.dest_group_id or 'LOGGER' }}</code></small>
+          </div>
+          <form action="/remove-spy" method="POST">
+            <input type="hidden" name="user_id" value="{{ spy.user_id }}">
+            <button class="btn btn-err btn-sm">❌ Remove</button>
+          </form>
+        </div>
+        {% else %}<p class="empty">No active spy targets.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ USERS ═══ -->
+<div id="users" class="tab">
+  <div class="card"><h3>👥 User Database ({{ all_users_info|length }} detailed / {{ all_users|length }} total)</h3>
+    <div class="search-wrap">
+      <input type="text" class="fi" id="userSearch" placeholder="🔍 Search by name, username, or ID..." oninput="filterTable('userSearch', 'userTable')" style="margin:0">
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="userTable">
+        <thead><tr><th>User ID</th><th>Name</th><th>Username</th><th>Requests</th><th>Last Seen</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for u in all_users_info %}
+        <tr>
+          <td><code>{{ u.user_id }}</code></td>
+          <td>{{ u.first_name or '' }} {{ u.last_name or '' }}</td>
+          <td>{{ ('@' + u.username) if u.username else '—' }}</td>
+          <td><span class="tag tag-p">{{ u.total_requests }}</span></td>
+          <td style="color:var(--td);font-size:.75rem">{{ u.last_seen | int | string }}</td>
+          <td><span class="tag {{ 'tag-err' if u.is_restricted else 'tag-ok' }}">{{ 'Restricted' if u.is_restricted else 'Active' }}</span></td>
+          <td style="display:flex;gap:.3rem">
+            {% if u.is_restricted %}
+            <form action="/unrestrict-user" method="POST"><input type="hidden" name="user_id" value="{{ u.user_id }}"><button class="btn btn-ok btn-sm">Free</button></form>
+            {% else %}
+            <form action="/restrict-user" method="POST"><input type="hidden" name="user_id" value="{{ u.user_id }}"><input type="hidden" name="reason" value="Dashboard action"><button class="btn btn-err btn-sm">Block</button></form>
+            {% endif %}
+            <form action="/add-spy" method="POST"><input type="hidden" name="user_id" value="{{ u.user_id }}"><input type="hidden" name="dest_group_id" value="0"><button class="btn btn-a btn-sm">Spy</button></form>
+            <form action="/gban" method="POST"><input type="hidden" name="user_id" value="{{ u.user_id }}"><input type="hidden" name="reason" value="Dashboard ban"><button class="btn btn-err btn-sm">GBan</button></form>
+          </td>
+        </tr>
+        {% else %}<tr><td colspan="7" class="empty">No user info recorded yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SONG LOGS ═══ -->
+<div id="songlogs" class="tab">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0">🎵 Song Request Log ({{ song_logs|length }})</h3>
+      <form action="/clear-song-logs" method="POST"><button class="btn btn-err btn-sm">🗑️ Clear Logs</button></form>
+    </div>
+    <div class="search-wrap">
+      <input type="text" class="fi" id="songSearch" placeholder="🔍 Search song, user, or group..." oninput="filterTable('songSearch', 'songTable')" style="margin:0">
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="songTable">
+        <thead><tr><th>Time</th><th>User</th><th>User ID</th><th>Song</th><th>Group</th><th>Group ID</th><th>Duration</th></tr></thead>
+        <tbody>
+        {% for s in song_logs %}
+        <tr>
+          <td style="font-size:.75rem;color:var(--td)">{{ s.requested_at }}</td>
+          <td>{{ s.first_name }} {{ ('@'+s.username) if s.username else '' }}</td>
+          <td><code>{{ s.user_id }}</code></td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ s.song_name }}">
+            {% if s.song_link %}<a href="{{ s.song_link }}" target="_blank" style="color:var(--p)">{{ s.song_name }}</a>{% else %}{{ s.song_name }}{% endif %}
+          </td>
+          <td>{{ s.chat_title }}</td>
+          <td><code>{{ s.chat_id }}</code></td>
+          <td><span class="tag tag-a">{{ s.duration or '—' }}</span></td>
+        </tr>
+        {% else %}<tr><td colspan="7" class="empty">No song requests logged yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUDIT LOGS ═══ -->
+<div id="logs" class="tab">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0">📜 Audit Log ({{ audit_logs|length }})</h3>
+      <form action="/clear-logs" method="POST"><button class="btn btn-err btn-sm">🗑️ Clear Logs</button></form>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Time</th><th>Action</th><th>Performer</th><th>Target</th><th>Details</th></tr></thead>
+        <tbody>
+        {% for log in audit_logs %}
+        <tr>
+          <td style="font-size:.75rem;color:var(--td);white-space:nowrap">{{ log.timestamp }}</td>
+          <td><span class="tag tag-p">{{ log.action }}</span></td>
+          <td><code style="color:var(--a)">{{ log.performer }}</code></td>
+          <td><code>{{ log.target }}</code></td>
+          <td style="font-size:.75rem;color:var(--td);max-width:200px;overflow:hidden;text-overflow:ellipsis">{{ log.extra or '—' }}</td>
+        </tr>
+        {% else %}<tr><td colspan="5" class="empty">No audit logs.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0">📟 Runtime Terminal</h3>
+      <button class="btn btn-a btn-sm" onclick="refreshLogs()">🔄 Refresh</button>
+    </div>
+    <div id="log-box" class="logbox">Loading...</div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="settings" class="tab">
+  <div class="split2">
+    <div>
+      <div class="card"><h3>🌐 Download API Configuration</h3>
+        <form action="/addapi" method="POST">
+          <label class="lbl">Current API URL</label>
+          <input type="url" name="api_url" class="fi" value="{{ current_api or 'https://api.example.com/download' }}" required>
+          <button type="submit" class="btn btn-p">💾 Update API URL</button>
+        </form>
+      </div>
+      <div class="card"><h3>🔑 Dashboard Password</h3>
+        <form action="/update-password" method="POST">
+          <label class="lbl">New Password</label>
+          <input type="text" name="new_password" class="fi" placeholder="Enter new password" required minlength="4">
+          <button type="submit" class="btn btn-p">🔒 Change Password</button>
+        </form>
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>📦 Database & Storage</h3>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <a href="/download-db" class="btn btn-a">🗄️ Download SQLite Database</a>
+          <a href="/download-users-txt" class="btn btn-ok">👥 Export Users (TXT)</a>
+          <a href="/download-groups-txt" class="btn btn-a">🏘️ Export Groups (TXT)</a>
+          <form action="/clean" method="POST"><button class="btn btn-w">🧹 Clean Cache & Downloads</button></form>
+          <form action="/restart" method="POST"><button class="btn btn-err">🚀 Restart Bot</button></form>
+        </div>
+      </div>
+      <div class="card"><h3>📋 System Info</h3>
+        <div class="info-grid">
+          <div class="info-item"><span>Bot Name</span><b style="color:var(--a)">{{ bot_name }}</b></div>
+          <div class="info-item"><span>Owner ID</span><code>{{ owner_id }}</code></div>
+          <div class="info-item"><span>PID</span><code>{{ system.pid }}</code></div>
+          <div class="info-item"><span>Uptime</span><b style="color:var(--ok)">{{ system.uptime }}</b></div>
+          <div class="info-item"><span>Active Assistants</span><b style="color:var(--p)">{{ assistants|length }}</b></div>
+          <div class="info-item"><span>Download API</span><code style="font-size:.7rem">{{ current_api or 'N/A' }}</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function ST(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nl').forEach(l => l.classList.remove('active'));
+  const tab = document.getElementById(id);
+  if (tab) tab.classList.add('active');
+  if (el) el.classList.add('active');
+  else document.querySelector(`[data-tab="${id}"]`)?.classList.add('active');
+  if (id === 'logs') refreshLogs();
+  if (id === 'streams') { document.querySelectorAll('.queue-box').forEach(q => q.style.display='none'); }
+  history.replaceState(null, '', `/?tab=${id}`);
+}
+
+function toast(msg, type='s') {
+  const d = document.createElement('div');
+  d.className = `toast ${type}`;
+  d.innerHTML = `${type==='s'?'✅':'❌'} ${msg}`;
+  document.getElementById('toasts').appendChild(d);
+  setTimeout(() => d.remove(), 4000);
+}
+
+async function refreshLogs() {
+  const b = document.getElementById('log-box');
+  b.innerText = 'Connecting...';
+  try { const r = await fetch('/logs'); b.innerText = await r.text(); b.scrollTop = b.scrollHeight; }
+  catch(e) { b.innerText = 'Error: ' + e; }
+}
+
+function filterTable(inputId, tableId) {
+  const q = document.getElementById(inputId).value.toLowerCase();
+  const rows = document.getElementById(tableId).querySelectorAll('tbody tr');
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function handleGAction(v) {
+  const w = document.getElementById('extra-wrap');
+  const l = document.getElementById('extra-lbl');
+  const i = document.getElementById('extra-inp');
+  const needsExtra = ['set_title','set_description','delete_user_messages'];
+  if (needsExtra.includes(v)) {
+    w.style.display = 'block';
+    if (v === 'set_title') { l.innerText = 'New Title'; i.placeholder = 'Enter new group title'; }
+    else if (v === 'set_description') { l.innerText = 'New Description'; i.placeholder = 'Enter new description'; }
+    else { l.innerText = 'Target User ID'; i.placeholder = 'User ID whose messages to delete'; }
+  } else { w.style.display = 'none'; }
+}
+
+// ─── NOW PLAYING AUTO-REFRESH ──────────────────────────────
+async function refreshNowPlaying() {
+  const el = document.getElementById('now-playing-list');
+  if (!el) return;
+  try {
+    const r = await fetch('/api/now-playing');
+    const data = await r.json();
+    document.getElementById('np-status').textContent = '● live (' + data.length + ' active)';
+    data.forEach(np => {
+      const tid = np.chat_id;
+      const tEl = document.getElementById('np-title-' + tid);
+      const tiEl = document.getElementById('np-time-' + tid);
+      const bEl = document.getElementById('np-bar-' + tid);
+      const rEl = document.getElementById('np-req-' + tid);
+      if (tEl) tEl.textContent = np.title;
+      if (rEl) rEl.innerHTML = '👤 ' + np.requester + (np.video ? ' 🎬' : ' 🎵');
+      if (tiEl) {
+        const e = Math.floor(np.elapsed);
+        const d = Math.floor(np.duration_sec);
+        const fmt = s => { const m = Math.floor(s/60); const sec = s%60; return m + ':' + String(sec).padStart(2,'0'); };
+        tiEl.textContent = fmt(e) + ' / ' + fmt(d);
+      }
+      if (bEl) bEl.style.width = np.progress + '%';
+    });
+  } catch(e) { /* ignore */ }
+}
+
+async function refreshStats() {
+  try {
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    const cards = document.querySelectorAll('.sg .sc .sv');
+    if (cards.length >= 4) {
+      // Update animated counters gently
+      cards[0].textContent = d.users;
+      cards[1].textContent = d.chats;
+      cards[2].textContent = d.active_calls;
+      cards[3].textContent = d.songs_played;
+    }
+  } catch(e) { /* ignore */ }
+}
+
+// ─── QUEUE ─────────────────────────────────────
+async function toggleQueue(chatId) {
+  const box = document.getElementById('queue-' + chatId);
+  if (box.style.display !== 'block') {
+    box.style.display = 'block';
+    await loadQueue(chatId);
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+async function loadQueue(chatId) {
+  const el = document.getElementById('queue-list-' + chatId);
+  if (!el) return;
+  el.innerHTML = 'Loading...';
+  try {
+    const r = await fetch('/api/queue/' + chatId);
+    const data = await r.json();
+    if (data.queue.length === 0) {
+      el.innerHTML = '<p class="empty" style="padding:.5rem">Queue is empty</p>';
+      return;
+    }
+    let html = '';
+    data.queue.forEach((q, i) => {
+      const title = q.title.length > 35 ? q.title.substring(0,35) + '...' : q.title;
+      html += '<div class="queue-item"><span class="q-title">' + (i+1) + '. ' + title + '</span>'
+        + '<span style="color:var(--td);font-size:.72rem">' + q.duration + '</span>'
+        + '<form action="/api/remove-queue" method="POST" style="display:inline" onsubmit="return confirm(\'Remove from queue?\')">'
+        + '<input type="hidden" name="chat_id" value="' + chatId + '">'
+        + '<input type="hidden" name="index" value="' + i + '">'
+        + '<button class="btn btn-err btn-sm" style="padding:.2rem .5rem;font-size:.7rem">✕</button></form></div>';
+    });
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = '<p class="empty" style="padding:.5rem;color:var(--err)">Error loading queue</p>';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const p = new URLSearchParams(window.location.search);
+  ST(p.get('tab') || 'overview');
+  const s = p.get('success'), e = p.get('error');
+  if (s) toast(decodeURIComponent(s.replace(/\+/g,' ')));
+  if (e) toast(decodeURIComponent(e.replace(/\+/g,' ')), 'e');
+  // Animate counters
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const t = parseInt(el.dataset.count) || 0;
+    if (t === 0) return;
+    let c = 0; const step = Math.max(1, Math.ceil(t/40));
+    const id = setInterval(() => { c = Math.min(c+step, t); el.textContent = c; if(c>=t) clearInterval(id); }, 30);
+  });
+  // Auto-refresh now playing every 5s
+  setInterval(refreshNowPlaying, 5000);
+  // Auto-refresh stats every 10s
+  setInterval(refreshStats, 10000);
+  // Initial now-playing load
+  setTimeout(refreshNowPlaying, 1000);
+});
+</script>
+</body>
+</html>
