@@ -22,6 +22,22 @@ if ! command -v ffmpeg >/dev/null 2>&1; then
   fi
 fi
 
+# Make project-local binaries (ffmpeg, node) available for yt-dlp JS challenge solving
+if [ -d "$PWD/bin" ]; then
+  export PATH="$PWD/bin:$PATH"
+fi
+
+# Ensure a JS runtime is available for yt-dlp EJS challenge solving
+if ! command -v node >/dev/null 2>&1 && ! command -v deno >/dev/null 2>&1; then
+  echo "Installing node..."
+  mkdir -p bin
+  curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.xz -o /tmp/node.tar.xz
+  tar -xf /tmp/node.tar.xz -C /tmp
+  cp /tmp/node-v22.14.0-linux-x64/bin/node bin/node
+  chmod +x bin/node
+  export PATH="$PWD/bin:$PATH"
+fi
+
 # Run the bot
 python3 -m devverse
 

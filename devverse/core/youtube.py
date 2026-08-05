@@ -3,6 +3,7 @@
 # This file is part of Delete_ee
 
 import os
+import shutil
 import aiohttp
 import asyncio
 from typing import List, Union
@@ -359,11 +360,6 @@ class YouTube:
                 "quiet": True,
                 "no_playlist": True,
                 "fixup": "detect_or_warn",
-                "extractor_args": {
-                    "youtube": {
-                        "player_client": ["android", "ios", "tv"],
-                    }
-                },
                 "http_headers": {
                     "User-Agent": (
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -384,6 +380,13 @@ class YouTube:
 
             if os.path.exists(config.COOKIES_FILE):
                 ydl_opts["cookiefile"] = config.COOKIES_FILE
+
+            js_runtimes = {}
+            for runtime in ("node", "deno", "bun"):
+                if shutil.which(runtime):
+                    js_runtimes[runtime] = {}
+            if js_runtimes:
+                ydl_opts["js_runtimes"] = js_runtimes
 
             loop = asyncio.get_event_loop()
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:

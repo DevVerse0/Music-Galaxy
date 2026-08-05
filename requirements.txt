@@ -10,7 +10,8 @@ python-multipart>=0.0.9
 pytgcrypto>=1.2.11
 py-tgcalls~=2.2.10
 py-yt-search~=0.5.7
-https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
+https://github.com/yt-dlp/yt-dlp/archive/refs/tags/2026.07.04.tar.gz
+yt-dlp-ejs==0.8.0
 
 itsdangerous>=2.2.0
 python-jose[cryptography]>=3.3.0
