@@ -67,7 +67,6 @@ class MongoDatabase:
         await self.db.auth.create_index("user_id")
         await self.db.song_requests.create_index("user_id")
         await self.db.song_requests.create_index("chat_id")
-        await self.db.audit_log.create_index([("_id", -1)])
 
     async def _next_id(self, name: str) -> int:
         """Atomically generate an auto-increment id for a collection."""

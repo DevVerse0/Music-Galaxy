@@ -52,6 +52,11 @@ class Config:
         self.PING_IMG = getenv("PING_IMG", "")
         self.START_IMG = getenv("START_IMG", "")
 
+        # ─── Download API (for platforms where yt-dlp is blocked, e.g. Render) ──
+        self.DOWNLOAD_API = getenv("DOWNLOAD_API", "False").lower() == "true"
+        self.DOWNLOAD_API_URL = getenv("DOWNLOAD_API_URL") or ""
+        self.DOWNLOAD_API_KEY = getenv("DOWNLOAD_API_KEY") or ""
+
     def check(self):
         missing = [
             var
