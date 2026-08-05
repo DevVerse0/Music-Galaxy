@@ -9,6 +9,19 @@ echo "  💎 Version: 3.5.0"
 echo "  🛠️ Environment: Production"
 echo "----------------------------------------------------"
 
+# Ensure ffmpeg is available (Render / ephemeral environments)
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  if [ -x "$PWD/bin/ffmpeg" ]; then
+    export PATH="$PWD/bin:$PATH"
+  else
+    echo "Downloading ffmpeg..."
+    mkdir -p bin
+    curl -sL https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /tmp/ff.tar.xz
+    tar -xf /tmp/ff.tar.xz -C bin --strip-components=1
+    export PATH="$PWD/bin:$PATH"
+  fi
+fi
+
 # Run the bot
 python3 -m devverse
 
