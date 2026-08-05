@@ -61,6 +61,16 @@ async def main():
         except Exception as e:
             logger.error(f"Failed to save cookies: {e}")
 
+    if config.COOKIES:
+        try:
+            import os
+            os.makedirs(os.path.dirname(config.COOKIES_FILE) or ".", exist_ok=True)
+            with open(config.COOKIES_FILE, "w", encoding="utf-8") as f:
+                f.write(config.COOKIES)
+            logger.info("Cookies written from COOKIES env to %s", config.COOKIES_FILE)
+        except Exception as e:
+            logger.error(f"Failed to write COOKIES env: {e}")
+
 
     sudoers_list = await db.get_sudoers()
     app.sudoers.update(sudoers_list)

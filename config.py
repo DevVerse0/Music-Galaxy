@@ -57,6 +57,10 @@ class Config:
         self.DOWNLOAD_API_URL = getenv("DOWNLOAD_API_URL") or ""
         self.DOWNLOAD_API_KEY = getenv("DOWNLOAD_API_KEY") or ""
 
+        # ─── Cookies (for YouTube bot-check bypass) ──
+        # COOKIES_URL fetches cookies.txt from URL(s); COOKIES holds raw content.
+        self.COOKIES = getenv("COOKIES") or ""
+
     def check(self):
         missing = [
             var

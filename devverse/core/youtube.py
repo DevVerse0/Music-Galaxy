@@ -29,6 +29,27 @@ class YouTube:
         if self._session and not self._session.closed:
             await self._session.close()
 
+    async def save_cookies(self, url) -> None:
+        """Download cookies.txt from a URL (or list of URLs) for yt-dlp."""
+        import os
+        os.makedirs(os.path.dirname(config.COOKIES_FILE) or ".", exist_ok=True)
+        session = await self._get_session()
+        urls = url if isinstance(url, (list, tuple)) else [url]
+        for u in urls:
+            try:
+                async with session.get(u, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                    if resp.status != 200:
+                        logger.error(f"Failed to download cookies: {resp.status}")
+                        continue
+                    data = await resp.text()
+            except Exception as e:
+                logger.error(f"Cookies fetch error: {e!r}")
+                continue
+            with open(config.COOKIES_FILE, "w", encoding="utf-8") as f:
+                f.write(data)
+            logger.info("Cookies saved to %s", config.COOKIES_FILE)
+            return
+
     def valid(self, url: str) -> bool:
         """Check if a URL is a valid YouTube URL."""
         if not url:
@@ -334,7 +355,6 @@ class YouTube:
                 "concurrent_fragments": 5,
                 "no_check_certificate": True,
                 "extractor_retries": 3,
-                "ignoreerrors": True,
                 "no_warnings": True,
                 "quiet": True,
                 "no_playlist": True,
@@ -387,8 +407,9 @@ class YouTube:
                     song_name=song_id
                 )
                 return result[0]
+            logger.error(f"YouTube Download produced no file for {song_id}")
         except Exception as e:
-            logger.error(f"YouTube Download Error: {e}")
+            logger.error(f"YouTube Download Error: {e!r}")
 
         return None
 
