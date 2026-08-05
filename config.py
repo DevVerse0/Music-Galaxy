@@ -10,6 +10,8 @@ class Config:
 
         self.BOT_TOKEN = getenv("BOT_TOKEN") or ""
         self.DATABASE_URL = getenv("DATABASE_URL") or "database.db"
+        self.DATABASE_MONGO = getenv("DATABASE_MONGO", "False").lower() == "true"
+        self.MONGO_URI = getenv("MONGO_URI") or "mongodb://localhost:27017"
 
         self.LOGGER_ID = int(getenv("LOGGER_ID") or 0)
         self.OWNER_ID = int(getenv("OWNER_ID") or 0)

@@ -724,7 +724,7 @@ async def clear_audits(request: Request):
 @web_app.post("/clear-song-logs")
 async def clear_song_logs(request: Request):
     if not is_authenticated(request): return RedirectResponse(url="/", status_code=303)
-    await db.execute("DELETE FROM song_requests")
+    await db.clear_song_requests()
     await db.add_audit_log("Song Logs Cleared via Dashboard")
     return RedirectResponse(url="/?tab=songlogs&success=Song+logs+cleared", status_code=303)
 

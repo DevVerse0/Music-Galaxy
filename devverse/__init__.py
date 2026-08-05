@@ -46,7 +46,11 @@ from devverse.core.userbot import Userbot
 userbot = Userbot()
 
 from devverse.core.database import Database
-db = Database()
+if config.DATABASE_MONGO:
+    from devverse.core.database_mongo import MongoDatabase
+    db = MongoDatabase()
+else:
+    db = Database()
 
 from devverse.core.lang import Language
 lang = Language()

@@ -608,6 +608,9 @@ class Database:
         row = await self.fetchone("SELECT COUNT(*) as cnt FROM song_requests")
         return row['cnt'] if row else 0
 
+    async def clear_song_requests(self) -> None:
+        await self.execute("DELETE FROM song_requests")
+
     # ─── CACHE LOADING ────────────────────────────────────────────────────────
 
     # ─── ADMIN ALERT LOG ─────────────────────────────────────────────────────
