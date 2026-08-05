@@ -391,8 +391,13 @@ class MongoDatabase:
         )
 
     async def get_audit_logs(self, limit: int = 100) -> List[Dict]:
-        cursor = self.db.audit_log.find({}, {"_id": 0}).sort("_id", -1).limit(limit)
-        return [doc async for doc in cursor]
+        cursor = self.db.audit_log.find({}).sort("_id", -1).limit(limit)
+        logs = []
+        async for doc in cursor:
+            doc["id"] = doc.get("_id")
+            doc.pop("_id", None)
+            logs.append(doc)
+        return logs
 
     async def clear_audit_logs(self) -> None:
         await self.db.audit_log.delete_many({})
