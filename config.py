@@ -13,7 +13,7 @@ class Config:
 
         self.LOGGER_ID = int(getenv("LOGGER_ID") or 0)
         self.OWNER_ID = int(getenv("OWNER_ID") or 0)
-        self.OWNER_USERNAME = getenv("OWNER_USERNAME", "Delete_ee")
+        self.OWNER_USERNAME = (getenv("OWNER_USERNAME", "Delete_ee") or "").lstrip("@").strip()
         self.MAINTENANCE: bool = getenv("MAINTENANCE", "False").lower() == "true"
 
         self.PORT = int(getenv("PORT", 6090))
