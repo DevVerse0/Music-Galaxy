@@ -8,8 +8,8 @@
 [![](https://img.shields.io/badge/YouTube-Channel-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@DevVersehq)
 [![](https://img.shields.io/badge/Twitter-Follow-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/Delete_ee7)
 
-[![](https://img.shields.io/github/stars/anonymous/MusicGalaxy?style=social)](https://github.com/anonymous/MusicGalaxy)
-[![](https://img.shields.io/github/forks/anonymous/MusicGalaxy?style=social)](https://github.com/anonymous/MusicGalaxy)
+[![](https://img.shields.io/github/stars/anonymous/MusicGalaxy?style=social)](https://github.com/anonymous/Music-Galaxy)
+[![](https://img.shields.io/github/forks/anonymous/MusicGalaxy?style=social)](https://github.com/anonymous/Music-Galaxy)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
