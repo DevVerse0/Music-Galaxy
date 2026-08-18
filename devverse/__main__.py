@@ -65,7 +65,10 @@ async def main():
         try:
             import os
             raw = config.COOKIES.strip()
-            if raw.startswith("<") or "html" in raw[:200].lower():
+            non_comment = "\n".join(
+                line for line in raw.splitlines() if not line.strip().startswith("#")
+            ).strip()
+            if non_comment.startswith("<"):
                 logger.error("COOKIES env contains HTML, not valid cookies. Skipping.")
             else:
                 os.makedirs(os.path.dirname(config.COOKIES_FILE) or ".", exist_ok=True)
