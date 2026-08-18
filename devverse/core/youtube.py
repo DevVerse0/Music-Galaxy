@@ -367,14 +367,13 @@ class YouTube:
                 "fixup": "detect_or_warn",
                 "extractor_args": {
                     "youtube": {
-                        "player_client": ["web"],
-                        "player_skip": ["configs"],
+                        "player_client": ["mweb", "web"],
                     }
                 },
                 "http_headers": {
                     "User-Agent": (
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                        "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+                        "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 "
+                        "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
                     ),
                     "Referer": "https://www.youtube.com/",
                     "Origin": "https://www.youtube.com",
@@ -402,8 +401,12 @@ class YouTube:
                 ydl_opts["js_runtimes"] = js_runtimes
 
             loop = asyncio.get_event_loop()
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                await loop.run_in_executor(None, ydl.download, [url])
+            try:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    await loop.run_in_executor(None, ydl.download, [url])
+            except yt_dlp.utils.DownloadError as e:
+                logger.error(f"yt-dlp DownloadError for {song_id}: {e}")
+                raise
 
             result = sorted(
                 (
