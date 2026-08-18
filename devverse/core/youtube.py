@@ -359,12 +359,21 @@ class YouTube:
                 "no_warnings": True,
                 "quiet": True,
                 "no_playlist": True,
+                "geo_bypass": True,
                 "fixup": "detect_or_warn",
+                "extractor_args": {
+                    "youtube": {
+                        "player_client": ["web", "mweb", "android"],
+                        "player_skip": ["configs"],
+                    }
+                },
                 "http_headers": {
                     "User-Agent": (
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                        "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-                    )
+                        "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+                    ),
+                    "Referer": "https://www.youtube.com/",
+                    "Origin": "https://www.youtube.com",
                 },
             }
 
