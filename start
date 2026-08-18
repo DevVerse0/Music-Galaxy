@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Music Galaxy Bot Startup Script
-# Optimized for Railway
+# Optimized for Railway / Docker
 
 echo "----------------------------------------------------"
 echo "  🚀 Starting Music Galaxy..."
@@ -9,7 +9,6 @@ echo "  💎 Version: 3.5.0"
 echo "  🛠️ Environment: Production"
 echo "----------------------------------------------------"
 
-# Ensure ffmpeg is available (Render / ephemeral environments)
 if ! command -v ffmpeg >/dev/null 2>&1; then
   if [ -x "$PWD/bin/ffmpeg" ]; then
     export PATH="$PWD/bin:$PATH"
@@ -22,12 +21,10 @@ if ! command -v ffmpeg >/dev/null 2>&1; then
   fi
 fi
 
-# Make project-local binaries (ffmpeg, node) available for yt-dlp JS challenge solving
 if [ -d "$PWD/bin" ]; then
   export PATH="$PWD/bin:$PATH"
 fi
 
-# Ensure a JS runtime is available for yt-dlp EJS challenge solving
 if ! command -v node >/dev/null 2>&1 && ! command -v deno >/dev/null 2>&1; then
   echo "Installing node..."
   mkdir -p bin
@@ -38,6 +35,4 @@ if ! command -v node >/dev/null 2>&1 && ! command -v deno >/dev/null 2>&1; then
   export PATH="$PWD/bin:$PATH"
 fi
 
-# Run the bot
 python3 -m devverse
-

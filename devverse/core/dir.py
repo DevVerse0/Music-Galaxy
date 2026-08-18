@@ -10,16 +10,21 @@ def ensure_dirs():
     Ensure that the necessary directories exist.
     """
     if not shutil.which("ffmpeg"):
-        # Common Windows paths from winget/choco/manual
-        common_paths = [
-            "C:\\ffmpeg\\bin\\ffmpeg.exe",
-            os.path.expandvars("%LOCALAPPDATA%\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe"),
-            "tools\\ffmpeg.exe"
-        ]
+        if os.name == "nt":
+            common_paths = [
+                "C:\\ffmpeg\\bin\\ffmpeg.exe",
+                os.path.expandvars("%LOCALAPPDATA%\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe"),
+                "tools\\ffmpeg.exe"
+            ]
+        else:
+            common_paths = [
+                "/usr/bin/ffmpeg",
+                "/usr/local/bin/ffmpeg",
+                os.path.expanduser("~/bin/ffmpeg"),
+            ]
         found = False
         for path in common_paths:
             if os.path.exists(path):
-                # Add it to runtime path so subprocesses can find it
                 os.environ["PATH"] += os.pathsep + os.path.dirname(path)
                 found = True
                 break
