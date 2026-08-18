@@ -355,7 +355,7 @@ class YouTube:
 
         try:
             ydl_opts = {
-                "format": "bestvideo[height<=720]+bestaudio/best[height<=720]" if video else "bestaudio[abr<=128]/bestaudio",
+                "format": "bestvideo[height<=720]+bestaudio/best[height<=720]/best" if video else "bestaudio/best",
                 "outtmpl": f"{out_template}.%(ext)s",
                 "concurrent_fragments": 5,
                 "no_check_certificate": True,
@@ -367,7 +367,7 @@ class YouTube:
                 "fixup": "detect_or_warn",
                 "extractor_args": {
                     "youtube": {
-                        "player_client": ["web", "mweb", "android"],
+                        "player_client": ["web"],
                         "player_skip": ["configs"],
                     }
                 },
