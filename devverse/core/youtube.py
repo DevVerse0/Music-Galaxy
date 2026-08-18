@@ -353,82 +353,90 @@ class YouTube:
         url = f"https://www.youtube.com/watch?v={song_id}"
         out_template = f"downloads/{song_id}"
 
-        try:
-            ydl_opts = {
-                "format": "bestvideo[height<=720]+bestaudio/best[height<=720]/best" if video else "bestaudio/best",
-                "outtmpl": f"{out_template}.%(ext)s",
-                "concurrent_fragments": 5,
-                "no_check_certificate": True,
-                "extractor_retries": 3,
-                "no_warnings": True,
-                "quiet": True,
-                "no_playlist": True,
-                "geo_bypass": True,
-                "fixup": "detect_or_warn",
-                "extractor_args": {
-                    "youtube": {
-                        "player_client": ["mweb", "web"],
-                    }
-                },
-                "http_headers": {
-                    "User-Agent": (
-                        "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 "
-                        "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
-                    ),
-                    "Referer": "https://www.youtube.com/",
-                    "Origin": "https://www.youtube.com",
-                },
-            }
+        # Try multiple player client strategies
+        client_strategies = [
+            ["ios", "web"],
+            ["web_creator", "web"],
+            ["mweb", "web"],
+            ["android"],
+            ["web"],
+        ]
 
-            if video:
-                ydl_opts["merge_output_format"] = "mp4"
-            else:
-                # Modern yt-dlp API: legacy extract_audio/audio_format params are gone
-                ydl_opts["postprocessors"] = [{
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "128",
-                }]
-
-            if os.path.exists(config.COOKIES_FILE):
-                ydl_opts["cookiefile"] = config.COOKIES_FILE
-
-            js_runtimes = {}
-            for runtime in ("node", "deno", "bun"):
-                if shutil.which(runtime):
-                    js_runtimes[runtime] = {}
-            if js_runtimes:
-                ydl_opts["js_runtimes"] = js_runtimes
-
-            loop = asyncio.get_event_loop()
+        for attempt, clients in enumerate(client_strategies):
             try:
+                ydl_opts = {
+                    "format": "bestvideo[height<=720]+bestaudio/best[height<=720]/best" if video else "bestaudio/best",
+                    "outtmpl": f"{out_template}.%(ext)s",
+                    "concurrent_fragments": 5,
+                    "no_check_certificate": True,
+                    "extractor_retries": 2,
+                    "no_warnings": True,
+                    "quiet": True,
+                    "no_playlist": True,
+                    "geo_bypass": True,
+                    "fixup": "detect_or_warn",
+                    "extractor_args": {
+                        "youtube": {
+                            "player_client": clients,
+                        }
+                    },
+                    "http_headers": {
+                        "User-Agent": (
+                            "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 "
+                            "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
+                        ),
+                        "Referer": "https://www.youtube.com/",
+                        "Origin": "https://www.youtube.com",
+                    },
+                }
+
+                if video:
+                    ydl_opts["merge_output_format"] = "mp4"
+                else:
+                    ydl_opts["postprocessors"] = [{
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "128",
+                    }]
+
+                if os.path.exists(config.COOKIES_FILE):
+                    ydl_opts["cookiefile"] = config.COOKIES_FILE
+
+                js_runtimes = {}
+                for runtime in ("node", "deno", "bun"):
+                    if shutil.which(runtime):
+                        js_runtimes[runtime] = {}
+                if js_runtimes:
+                    ydl_opts["js_runtimes"] = js_runtimes
+
+                loop = asyncio.get_event_loop()
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     await loop.run_in_executor(None, ydl.download, [url])
-            except yt_dlp.utils.DownloadError as e:
-                logger.error(f"yt-dlp DownloadError for {song_id}: {e}")
-                raise
 
-            result = sorted(
-                (
-                    f
-                    for f in glob.glob(f"{out_template}.*")
-                    if not utils.is_download_fragment(f)
-                ),
-                key=os.path.getmtime,
-                reverse=True,
-            )
-            if result:
-                from devverse import db
-                await db.register_file(
-                    song_id=song_id,
-                    storage_path=result[0],
-                    public_url="local",
-                    song_name=song_id
+                result = sorted(
+                    (
+                        f
+                        for f in glob.glob(f"{out_template}.*")
+                        if not utils.is_download_fragment(f)
+                    ),
+                    key=os.path.getmtime,
+                    reverse=True,
                 )
-                return result[0]
-            logger.error(f"YouTube Download produced no file for {song_id}")
-        except Exception as e:
-            logger.error(f"YouTube Download Error: {e!r}")
+                if result:
+                    from devverse import db
+                    await db.register_file(
+                        song_id=song_id,
+                        storage_path=result[0],
+                        public_url="local",
+                        song_name=song_id
+                    )
+                    return result[0]
+                logger.error(f"YouTube Download produced no file for {song_id}")
+                return None
+            except Exception as e:
+                logger.warning(f"yt-dlp attempt {attempt+1}/{len(client_strategies)} failed (clients={clients}): {e!r}")
+                continue
 
+        logger.error(f"All yt-dlp strategies failed for {song_id}")
         return None
 
