@@ -40,16 +40,20 @@ class YouTube:
             try:
                 async with session.get(u, timeout=aiohttp.ClientTimeout(total=30)) as resp:
                     if resp.status != 200:
-                        logger.error(f"Failed to download cookies: {resp.status}")
+                        logger.error(f"Failed to download cookies from {u}: HTTP {resp.status}")
                         continue
                     data = await resp.text()
             except Exception as e:
-                logger.error(f"Cookies fetch error: {e!r}")
+                logger.error(f"Cookies fetch error from {u}: {e!r}")
+                continue
+            if data.lstrip().startswith("<") or "html" in data[:200].lower():
+                logger.error(f"Cookies URL returned HTML instead of cookies.txt: {u}")
                 continue
             with open(config.COOKIES_FILE, "w", encoding="utf-8") as f:
                 f.write(data)
             logger.info("Cookies saved to %s", config.COOKIES_FILE)
             return
+        logger.error("No valid cookies downloaded from any COOKIES_URL source")
 
     def valid(self, url: str) -> bool:
         """Check if a URL is a valid YouTube URL."""

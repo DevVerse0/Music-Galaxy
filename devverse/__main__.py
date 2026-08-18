@@ -64,10 +64,14 @@ async def main():
     if config.COOKIES:
         try:
             import os
-            os.makedirs(os.path.dirname(config.COOKIES_FILE) or ".", exist_ok=True)
-            with open(config.COOKIES_FILE, "w", encoding="utf-8") as f:
-                f.write(config.COOKIES)
-            logger.info("Cookies written from COOKIES env to %s", config.COOKIES_FILE)
+            raw = config.COOKIES.strip()
+            if raw.startswith("<") or "html" in raw[:200].lower():
+                logger.error("COOKIES env contains HTML, not valid cookies. Skipping.")
+            else:
+                os.makedirs(os.path.dirname(config.COOKIES_FILE) or ".", exist_ok=True)
+                with open(config.COOKIES_FILE, "w", encoding="utf-8") as f:
+                    f.write(raw)
+                logger.info("Cookies written from COOKIES env to %s", config.COOKIES_FILE)
         except Exception as e:
             logger.error(f"Failed to write COOKIES env: {e}")
 
